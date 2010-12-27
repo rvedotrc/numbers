@@ -1,8 +1,7 @@
-all: numbers-fast test
+.PHONY: all test
 
-test:
-	# -./numbers a b c
-	# -./numbers 1 2 ""
-	# -./numbers 6 7 9991919
-	-./numbers-fast 6 7 23
+all: numbers-fast
+
+test: numbers numbers-fast
+	prove -vr t
 

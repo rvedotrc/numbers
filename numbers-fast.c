@@ -3,6 +3,9 @@
 
 #define MAX_NUMS 10
 
+int target = 0;
+int best_diff = -1;
+
 union operand {
 	int n;
 	char o;
@@ -75,7 +78,15 @@ void show_state(const struct state *s, const char *n) {
 }
 
 void leaf(const struct state *s) {
-	show_state(s, "leaf");
+	if (target == 0) {
+		show_state(s, "leaf");
+	} else {
+		int diff = abs(s->stack[0] - target);
+		if (best_diff < 0 || diff <= best_diff) {
+			show_state(s, "leaf");
+			best_diff = diff;
+		}
+	}
 }
 
 void try(const struct state *s) {
@@ -162,6 +173,12 @@ int main(int argc, char **argv) {
 	++argv;
 
 	if (argc > MAX_NUMS) logdie("Too many arguments");
+
+	if (argc) {
+		target = parsearg(argv[0]);
+		--argc;
+		++argv;
+	}
 
 	for (i=0; i<argc; ++i) {
 		st.nums[i] = parsearg(argv[i]);

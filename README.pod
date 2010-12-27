@@ -1,0 +1,33 @@
+=head1 NAME
+
+numbers - "Countdown" numbers game solver
+
+=head1 SYNOPSIS
+
+  # Show all possible combinations
+  ./numbers NUMBER [NUMBER ...]
+
+  # As above, but only show combinations which are at least as close to the
+  # target as the closest found so far
+  ./numbers -t TARGET NUMBER [NUMBER ...]
+
+=head1 DESCRIPTION
+
+See L<http://en.wikipedia.org/wiki/Countdown_(game_show)#Numbers_round>
+
+Normally the game is played with 6 numbers, and a target in the range 100-999.
+This solver allows 1 to 10 numbers; the numbers, and the target, may be in the
+range 1-999.
+
+The solver brute-forces all possible combinations.  You can either elect not
+to specify a target (to see all possible combinations), or to specify a target
+(in which case the solver only outputs combinations which are at least as
+close to the target as the closest found so far).
+
+=head1 AUTHOR
+
+Dave Evans
+
+L<http://djce.org.uk/countdown>
+
+=cut

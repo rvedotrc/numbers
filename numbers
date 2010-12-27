@@ -1,0 +1,285 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+use integer;
+$| = 1;
+
+my $help = <<EOF;
+Usage: numbers [OPTIONS] NUMBER ...
+
+\    -t, --target=TARGET Set the target number
+\    -a, --all           Include results which are further away from TARGET
+\                        than the closest found so far (requires --target)
+\    -w, --within=DIFF   Ignore results more than DIFF away from TARGET
+\                        (requires --target)
+\    -h, --help          Shows this help
+
+Examples:
+
+  # Solve (1,2,3) showing all possible combinations:
+  numbers 1 2 3
+
+  # Solve (3,4,5,7) showing all solutions within 5 of 90:
+  numbers --all --within=5 --target=90 3 4 5 7
+
+  # Solve (3,4,5,7) showing solutions within 5 of 90, but ignoring solutions
+  # which are further away from the target than than the closest we've found
+  # so far:
+  numbers --within=5 --target=90 3 4 5 7
+
+  # As above, but don't wait until we get within 5 before showing any
+  # solutions:
+  numbers --target=90 3 4 5 7
+
+EOF
+
+sub usage
+{
+	my $msg = shift;
+	print STDERR "Error: $msg\n\n" if defined $msg;
+	print STDERR $help;
+	exit 2;
+}
+
+{
+	my $target;
+	my $all;
+	my $within;
+
+	use Getopt::Long;
+	GetOptions(
+		"target|t=n"	=> \$target,
+		"all|a"			=> \$all,
+		"within|w=n"	=> \$within,
+		"help|h"		=> sub { print $help; exit; },
+	) or exit 2;
+
+	usage("--within makes no sense without --target")
+		if defined($within) and not defined($target);
+
+	usage("--all makes no sense without --target")
+		if $all and not defined($target);
+
+	@ARGV or usage("No numbers specified");
+
+	my @nums = @ARGV;
+	my $cb;
+
+	# Remove duplicates before showing.
+	# Duplicates can arrive because differing stacks get collapsed to
+	# identical expressions (e.g.: 1 2 3 + + ; 2 1 3 + +)
+	my %shown;
+	my $show = sub {
+		my $e = revpol_to_string($_[1]);
+		return if $shown{$e}++;
+		print $e, " = $_[0]\n";
+	};
+
+	if (defined $target)
+	{
+		my $best = undef;
+		my $best_r;
+
+		$cb = sub {
+			my ($got, $ops) = @_;
+			my $got_r = abs($got-$target);
+			return if defined($within) and $got_r > $within;
+			return if not $all and defined($best_r) and $got_r > $best_r;
+			$best_r = $got_r; $best = $got;
+			&$show(@_);
+		};
+	} else {
+		$cb = $show;
+	}
+
+	solve(\@nums, $cb);
+}
+
+sub solve
+{
+	my ($nums, $cb) = @_;
+
+	open(my $pipe, "-|", "./numbers-fast", @$nums) or die $!;
+	while (<$pipe>) {
+		# leaf = nums=0 () ops=3 (1 2 +) stack=1 (3)
+		# print "<< $_";
+		my ($ops, $got) = /^leaf = .* ops=\d+ \((.*)\) stack=1 \((\d+)\) *$/
+			or next;
+		&$cb($got, [split ' ', $ops]);
+	}
+	close $pipe;
+	$? == 0 or die "exec failed (rc=$?)";
+}
+
+sub revpol_to_string
+{
+	my ($ops) = @_;
+	my $t = revpol_to_tree($ops);
+	xform_tree($t);
+	coalesce_nodes($t);
+	return node_to_string($t);
+}
+
+sub revpol_to_tree
+{
+	my ($ops) = @_;
+	my @stack;
+
+	for my $op (@$ops)
+	{
+		if ($op =~ /\d/)
+		{
+			push @stack, { val => $op };
+		} else {
+			my $x = pop @stack;
+			my $y = pop @stack;
+
+			push @stack, {
+				op => $op,
+				l => $x,
+				r => $y,
+				val => 0+eval("$x->{val} $op $y->{val}"),
+			};
+		}
+	}
+
+	@stack == 1 or die;
+	$stack[0];
+}
+
+sub xform_tree
+{
+	my ($node) = @_;
+	$node->{op} or return;
+
+	xform_tree($node->{l});
+	xform_tree($node->{r});
+
+	if ($node->{op} eq "+")
+	{
+		%$node = (
+			type => "+",
+			p => [ $node->{l}, $node->{r} ],
+			n => [],
+			val => $node->{val},
+		);
+	}
+	elsif ($node->{op} eq "-")
+	{
+		%$node = (
+			type => "+",
+			p => [ $node->{l} ],
+			n => [ $node->{r} ],
+			val => $node->{val},
+		);
+	}
+	elsif ($node->{op} eq "*")
+	{
+		%$node = (
+			type => "*",
+			p => [ $node->{l}, $node->{r} ],
+			n => [],
+			val => $node->{val},
+		);
+	}
+	elsif ($node->{op} eq "/")
+	{
+		%$node = (
+			type => "*",
+			p => [ $node->{l} ],
+			n => [ $node->{r} ],
+			val => $node->{val},
+		);
+	}
+}
+
+sub coalesce_nodes
+{
+	my ($node) = @_;
+	$node->{type} or return;
+
+	my $p = $node->{p};
+	my $n = $node->{n};
+
+	coalesce_nodes($_) for @$p;
+	coalesce_nodes($_) for @$n;
+
+	for (my $i=0; $i <= $#$p; ++$i)
+	{
+		my $c = $p->[$i];
+		next unless $c->{type} and $c->{type} eq $node->{type};
+		splice(@$p, $i, 1);
+
+		push @$p, @{ $c->{p} };
+		push @$n, @{ $c->{n} };
+
+		redo;
+	}
+
+	for (my $i=0; $i <= $#$n; ++$i)
+	{
+		my $c = $n->[$i];
+		next unless $c->{type} and $c->{type} eq $node->{type};
+		splice(@$n, $i, 1);
+
+		push @$p, @{ $c->{n} };
+		push @$n, @{ $c->{p} };
+
+		redo;
+	}
+
+	# Sort n and p by value
+	for my $l ($p, $n)
+	{
+		@$l = sort {
+			$b->{val} <=> $a->{val}
+		} @$l;
+	}
+}
+
+sub node_to_string
+{
+	my ($node) = @_;
+	return $node->{val} unless $node->{type};
+
+	my $p = $node->{p};
+	my $n = $node->{n};
+	@$p or die;
+
+	if ($node->{type} eq "+")
+	{
+		my @p = map { node_to_string($_) } @$p;
+		my @n = map { node_to_string($_) } @$n;
+
+		# The only other node type is "*", which is higher priority than us,
+		# so brackets aren't needed here.
+
+		my $s = join " + ", @p;
+		$s .= " - $_" for @n;
+		return $s;
+	}
+
+	if ($node->{type} eq "*")
+	{
+		my @p = map { node_to_string($_) } @$p;
+		my @n = map { node_to_string($_) } @$n;
+
+		# The only other node type is "+", which is lower priority than us,
+		# so brackets *are* needed here.
+
+		for (@p, @n)
+		{
+			$_ = "($_)" if /\D/;
+		}
+
+		my $s = join " * ", @p;
+		$s .= " / $_" for @n;
+		return $s;
+	}
+
+	die "Unknown node type '$node->{type}'";
+}
+
+# eof numbers

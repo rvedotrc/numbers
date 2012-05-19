@@ -9,6 +9,23 @@ public class BinopNode implements Solvable {
         this.left = left;
         this.operator = operator;
         this.right = right;
+
+        if (operator == Operator.SUBTRACT) {
+            if (right.solve() > left.solve()) {
+                throw new IllegalStateException("Result of SUBTRACT node would be negative");
+            }
+
+            if (right.solve().equals( left.solve() )) {
+                throw new IllegalStateException("Result of SUBTRACT node would be zero");
+            }
+        }
+
+        if (operator == Operator.DIVIDE) {
+            Long remainder = left.solve() % right.solve();
+            if (!remainder.equals(0L)) {
+                throw new IllegalStateException("Result of DIVIDE node would be fractional");
+            }
+        }
     }
 
     @Override

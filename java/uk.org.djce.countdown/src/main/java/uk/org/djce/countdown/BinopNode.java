@@ -1,7 +1,5 @@
 package uk.org.djce.countdown;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class BinopNode implements Solvable {
     private final Operator operator;
     private final Solvable left;

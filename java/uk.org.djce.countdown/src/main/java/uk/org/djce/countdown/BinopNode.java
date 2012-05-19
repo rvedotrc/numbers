@@ -4,6 +4,7 @@ public class BinopNode implements Solvable {
     private final Operator operator;
     private final Solvable left;
     private final Solvable right;
+    private final Long value;
 
     public BinopNode(Solvable left, Operator operator, Solvable right) {
         this.left = left;
@@ -26,20 +27,22 @@ public class BinopNode implements Solvable {
                 throw new IllegalStateException("Result of DIVIDE node would be fractional");
             }
         }
+
+        if (operator == Operator.ADD) {
+            value = left.solve() + right.solve();
+        } else if (operator == Operator.SUBTRACT) {
+            value = left.solve() - right.solve();
+        } else if (operator == Operator.MULTIPLY) {
+            value = left.solve() * right.solve();
+        } else if (operator == Operator.DIVIDE) {
+            value = left.solve() / right.solve();
+        } else {
+            throw new IllegalStateException("Unknown operator "+operator);
+        }
     }
 
     @Override
     public Long solve() {
-        if (operator == Operator.ADD) {
-            return left.solve() + right.solve();
-        } else if (operator == Operator.SUBTRACT) {
-            return left.solve() - right.solve();
-        } else if (operator == Operator.MULTIPLY) {
-            return left.solve() * right.solve();
-        } else if (operator == Operator.DIVIDE) {
-            return left.solve() / right.solve();
-        }
-
-        throw new IllegalStateException("Unknown operator "+operator);
+        return value;
     }
 }

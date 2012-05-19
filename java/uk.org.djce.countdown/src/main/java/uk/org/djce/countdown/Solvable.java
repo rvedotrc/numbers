@@ -8,4 +8,6 @@ public interface Solvable {
 
     public Long solve();
 
+    public String expressAsString();
+
 }

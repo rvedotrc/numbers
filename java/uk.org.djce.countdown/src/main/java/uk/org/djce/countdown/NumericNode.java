@@ -11,4 +11,9 @@ public class NumericNode implements Solvable {
     public Long solve() {
         return value;
     }
+
+    @Override
+    public String expressAsString() {
+        return value.toString();
+    }
 }

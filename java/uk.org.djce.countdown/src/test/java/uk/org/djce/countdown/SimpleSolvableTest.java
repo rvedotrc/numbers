@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class SolvableTest {
+public class SimpleSolvableTest {
 
     @Test
     public void solveNumber() {

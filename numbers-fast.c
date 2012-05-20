@@ -89,9 +89,7 @@ void leaf(const struct state *s) {
 	}
 }
 
-void try(const struct state *s) {
-	struct state next_st;
-	// printf("s=%p next_st=%p\n", s, &next_st);
+void try(struct state *s) {
 	// show_state(s, "s");
 
 	if (s->num_stack == 1) {
@@ -100,51 +98,56 @@ void try(const struct state *s) {
 		int x = s->stack[ s->num_stack-1 ];
 		int y = s->stack[ s->num_stack-2 ];
 
-		next_st = *s;
-		next_st.num_ops++;
-		next_st.num_stack--;
-		next_st.ops[ next_st.num_ops-1 ].is_number = 0;
+		s->num_ops++;
+		s->num_stack--;
+		s->ops[ s->num_ops-1 ].is_number = 0;
 
 		if (x>=y) { // shortcut
 			// printf("push +\n");
-			next_st.ops[ next_st.num_ops-1 ].operand.o = '+';
-			next_st.stack[ next_st.num_stack-1 ] = x + y;
-			try(&next_st);
+			s->ops[ s->num_ops-1 ].operand.o = '+';
+			s->stack[ s->num_stack-1 ] = x + y;
+			try(s);
 		}
 
 		if (x > y) { // avoid making 0
 			// printf("push -\n");
-			next_st.ops[ next_st.num_ops-1 ].operand.o = '-';
-			next_st.stack[ next_st.num_stack-1 ] = x - y;
-			try(&next_st);
+			s->ops[ s->num_ops-1 ].operand.o = '-';
+			s->stack[ s->num_stack-1 ] = x - y;
+			try(s);
 		}
 
 		if (x >= y && x > 1 && y > 1) { // shortcut, and avoid *1
 			// printf("push *\n");
-			next_st.ops[ next_st.num_ops-1 ].operand.o = '*';
-			next_st.stack[ next_st.num_stack-1 ] = x * y;
-			try(&next_st);
+			s->ops[ s->num_ops-1 ].operand.o = '*';
+			s->stack[ s->num_stack-1 ] = x * y;
+			try(s);
 		}
 
 		if (y > 1 && (x % y) == 0) { // avoid /1
 			// printf("push /\n");
-			next_st.ops[ next_st.num_ops-1 ].operand.o = '/';
-			next_st.stack[ next_st.num_stack-1 ] = x / y;
-			try(&next_st);
+			s->ops[ s->num_ops-1 ].operand.o = '/';
+			s->stack[ s->num_stack-1 ] = x / y;
+			try(s);
 		}
+
+		s->num_ops--;
+		s->num_stack++;
+
+		s->stack[ s->num_stack-1 ] = x;
+		s->stack[ s->num_stack-2 ] = y;
 	}
 
 	if (s->num_nums) {
 		int i,j;
 		// push a number
 
-		next_st = *s;
-		next_st.num_nums--;
-		next_st.num_ops++;
-		next_st.ops[ next_st.num_ops-1 ].is_number = 1;
-		next_st.num_stack++;
+		s->num_nums--;
+		int top_num = s->nums[s->num_nums];
+		s->num_ops++;
+		s->ops[ s->num_ops-1 ].is_number = 1;
+		s->num_stack++;
 
-		for (i=0; i<s->num_nums; ++i) {
+		for (i=0; i<=s->num_nums; ++i) {
 			int doneit = 0;
 			for (j=0; j<i; ++j) {
 				if (s->nums[i] == s->nums[j]) {
@@ -156,12 +159,21 @@ void try(const struct state *s) {
 
 			// printf("push %d\n", s->nums[i]);
 
-			next_st.nums[i] = next_st.nums[next_st.num_nums];
-			next_st.ops[ next_st.num_ops-1 ].operand.n = s->nums[i];
-			next_st.stack[ next_st.num_stack-1 ] = s->nums[i];
-			try(&next_st);
-			next_st.nums[i] = s->nums[i];
+			int thisnum = s->nums[i];
+
+			s->nums[i] = top_num;
+			s->ops[ s->num_ops-1 ].operand.n = thisnum;
+			s->stack[ s->num_stack-1 ] = thisnum;
+
+			try(s);
+
+			s->nums[s->num_nums] = top_num;
+			s->nums[i] = thisnum;
 		}
+
+		s->num_nums++;
+		s->num_ops--;
+		s->num_stack--;
 	}
 }
 

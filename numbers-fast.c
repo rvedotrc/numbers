@@ -18,11 +18,11 @@ struct op {
 
 struct state {
 	int num_nums;
-	int nums[MAX_NUMS];
+	int *nums;
 	int num_ops;
-	struct op ops[MAX_NUMS*2];
+	struct op *ops;
 	int num_stack;
-	int stack[MAX_NUMS];
+	int *stack;
 };
 
 void logdie(const char *s) {
@@ -184,13 +184,18 @@ int main(int argc, char **argv) {
 	--argc;
 	++argv;
 
-	if (argc > MAX_NUMS) logdie("Too many arguments");
-
 	if (argc) {
 		target = parsearg(argv[0]);
 		--argc;
 		++argv;
 	}
+
+	int max_nums = argc;
+	int max_ops = 2 * max_nums - 1;
+	int max_stack = max_nums;
+	if (!( st.nums = malloc(sizeof(int) * max_nums) )) logdie("out of memory");
+	if (!( st.ops = malloc(sizeof(struct op) * max_ops) )) logdie("out of memory");
+	if (!( st.stack = malloc(sizeof(int) * max_stack) )) logdie("out of memory");
 
 	for (i=0; i<argc; ++i) {
 		st.nums[i] = parsearg(argv[i]);

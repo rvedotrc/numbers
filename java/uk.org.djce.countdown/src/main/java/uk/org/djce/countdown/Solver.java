@@ -3,7 +3,11 @@ package uk.org.djce.countdown;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Solver {
+public final class Solver {
+
+    private Solver() {
+
+    }
 
     public static void solveAndPrint(Long target, List<Long> numbers) {
         Long bestDistance = null;

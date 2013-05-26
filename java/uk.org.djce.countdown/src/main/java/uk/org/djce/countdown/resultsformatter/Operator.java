@@ -18,9 +18,16 @@ public enum Operator {
 
     public static Operator findByOp(final String op) {
         for (Operator operator : Operator.values()) {
-            if (operator.op.equals(op)) return operator;
+            if (operator.op.equals(op)) {
+                return operator;
+            }
         }
+
         throw new IllegalArgumentException();
+    }
+
+    public String toString() {
+        return op;
     }
 }
 

@@ -11,11 +11,13 @@ import java.util.Map;
 
 public class SolverState {
 
-    ImmutableList<Solvable> stack;
-    ImmutableMap<Long, Integer> unusedNumbers;
+    private ImmutableList<Solvable> stack;
+    private ImmutableMap<Long, Integer> unusedNumbers;
 
     public SolverState (List<Long> numbers) {
-        if (numbers.isEmpty()) throw new IllegalStateException();
+        if (numbers.isEmpty()) {
+            throw new IllegalStateException();
+        }
 
         Map<Long, Integer> m = new HashMap<Long, Integer>();
         for (Long n : numbers) {
@@ -33,7 +35,9 @@ public class SolverState {
     private SolverState(SolverState parent, Long pushNumber) {
         Map<Long, Integer> newUnusedNumbers = new HashMap<Long, Integer>(parent.unusedNumbers);
 
-        if (!newUnusedNumbers.containsKey(pushNumber)) throw new IllegalStateException();
+        if (!newUnusedNumbers.containsKey(pushNumber)) {
+            throw new IllegalStateException();
+        }
 
         if (newUnusedNumbers.get(pushNumber) > 1) {
             newUnusedNumbers.put(pushNumber, newUnusedNumbers.get(pushNumber) - 1);
@@ -53,7 +57,9 @@ public class SolverState {
     private SolverState(SolverState parent, Solvable.Operator pushOperator) {
         List<Solvable> newStack = new ArrayList<Solvable>(parent.stack);
 
-        if (newStack.size() < 2) throw new IllegalStateException();
+        if (newStack.size() < 2) {
+            throw new IllegalStateException();
+        }
 
         Solvable right = newStack.remove(newStack.size() - 1);
         Solvable left = newStack.remove(newStack.size() - 1);
@@ -85,7 +91,9 @@ public class SolverState {
     }
 
     public Solvable solvable() {
-        if (!isSolvable()) throw new IllegalStateException();
+        if (!isSolvable()) {
+            throw new IllegalStateException();
+        }
         return stack.get(0);
     }
 

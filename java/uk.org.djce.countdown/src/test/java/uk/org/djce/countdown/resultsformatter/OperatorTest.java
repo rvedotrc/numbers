@@ -25,5 +25,6 @@ public class OperatorTest {
     private void testBothWays(Operator operator, String string) {
         assertEquals(operator, Operator.findByOp(string));
         assertEquals(string, operator.getOp());
+        assertEquals(string, operator.toString());
     }
 }

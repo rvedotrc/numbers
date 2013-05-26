@@ -8,7 +8,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.BufferedReader;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class LeafLineParserTest {
         );
 
         assertEquals(11, captor.getValue().size());
-        assertEquals(8L, captor.getValue().get(0).getNumber().longValue());
+        assertEquals(8L, captor.getValue().get(0).getNumber());
         assertEquals(Operator.MULTIPLY, captor.getValue().get(10).getOperator());
     }
 

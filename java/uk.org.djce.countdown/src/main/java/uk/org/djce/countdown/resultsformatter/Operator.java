@@ -1,10 +1,50 @@
 package uk.org.djce.countdown.resultsformatter;
 
 public enum Operator {
-    ADD("+"),
-    SUBTRACT("-"),
-    MULTIPLY("*"),
-    DIVIDE("/");
+    ADD("+") {
+        @Override
+        public boolean areArgsAllowable(long left, long right) {
+            return true;
+        }
+
+        @Override
+        public long evaluate(long left, long right) {
+            return left + right;
+        }
+    },
+    SUBTRACT("-") {
+        @Override
+        public boolean areArgsAllowable(long left, long right) {
+            return left > right;
+        }
+
+        @Override
+        public long evaluate(long left, long right) {
+            return left - right;
+        }
+    },
+    MULTIPLY("*") {
+        @Override
+        public boolean areArgsAllowable(long left, long right) {
+            return true;
+        }
+
+        @Override
+        public long evaluate(long left, long right) {
+            return left * right;
+        }
+    },
+    DIVIDE("/") {
+        @Override
+        public boolean areArgsAllowable(long left, long right) {
+            return((left % right)==0);
+        }
+
+        @Override
+        public long evaluate(long left, long right) {
+            return left / right;
+        }
+    };
 
     private final String op;
 
@@ -29,5 +69,8 @@ public enum Operator {
     public String toString() {
         return op;
     }
+
+    public abstract boolean areArgsAllowable(long left, long right);
+    public abstract long evaluate(long left, long right);
 }
 

@@ -10,7 +10,7 @@ public class NumberOrOperatorTest {
     public void itShouldSupportNumbers() throws Exception {
         NumberOrOperator n = new NumberOrOperator(123L);
         assertFalse(n.isOperator());
-        assertEquals(123L, n.getNumber().longValue());
+        assertEquals(123L, n.getNumber());
         assertEquals("123", n.toString());
     }
 

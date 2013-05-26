@@ -18,7 +18,7 @@ public class NumberOrOperator {
         return(this.operator != null);
     }
 
-    public Long getNumber() {
+    public long getNumber() {
         return this.number;
     }
 

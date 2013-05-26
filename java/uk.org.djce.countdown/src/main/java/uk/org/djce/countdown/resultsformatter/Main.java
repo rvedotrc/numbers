@@ -13,7 +13,8 @@ public final class Main {
     public static void main(final String[] rawArgs) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 
-        LeafProcessor lp = new LeafProcessor();
+        OpTreeBuilder opTreeBuilder = new OpTreeBuilder();
+        LeafProcessor lp = new LeafProcessor(opTreeBuilder);
         LeafLineParser leafLineParser = new LeafLineParser(lp);
 
         new NumbersResultsProcessor(bufferedReader, leafLineParser).run();

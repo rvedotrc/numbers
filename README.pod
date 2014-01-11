@@ -24,9 +24,85 @@ to specify a target (to see all possible combinations), or to specify a target
 (in which case the solver only outputs combinations which are at least as
 close to the target as the closest found so far).
 
+=head2 The algorithm
+
+The heavy lifting is done in C (for speed).  The results are then formatted
+using Perl (because it is the language I was most familiar with at the time).
+
+The algorithm is based on a Reverse-Polish stack.  At any given time we have:
+
+=over
+
+=item *
+
+a set of numbers we haven't used yet (i.e. initially, the 6 numbers the user entered)
+
+=item *
+
+a results stack
+
+=item *
+
+a sequence of operators and operands which got us this far
+
+=back
+
+The program then tries all possible combinations: if the set of unused numbers
+isn't empty, we can push one of those numbers onto the stack (we try each one
+in turn).
+
+If the results stack contains at least two results, we can also use operators:
+at any time we can push "+" or "*" (because any two numbers in Countdown can
+be added or multiplied); we can only push "-" if the result doesn't go zero or
+negative, and we can only push "/" if the result is a whole number.
+
+Any time the results stack contains exactly one result, we have a valid sum
+(which may or may not be anywhere near the target).
+
+Example: given the starting numbers 1, 5, 6, 9 we might have got to this
+point:
+
+  operators used: 6 9
+  results stack:  6 9
+  numbers unused: 1 5
+
+At this point, we could push either "1" or "5" onto the stack, and keep going;
+or we could push "+" to get 15, or "*" to get 54, or "-" to get 3.  We can't
+push "/", because 9/6 isn't a whole number.
+
+If we chose to push "*", that leads us to this point:
+
+  operators used: 6 9 *
+  results stack:  54
+  numbers unused: 1 5
+
+At this point, we have a valid answer (6 * 9 = 54); or we could push either
+"1" or "5" onto the stack, and keep going; we can't push any operators right
+now, because the results stack contains only one result.
+
+At all times, all possible "moves" are tried.
+
+=head2 Optimisations
+
+The code does contain a few optimisations.
+
+It avoids copying memory around - one only "state" is kept at any one time,
+and the call stack is used to mutate that state, then revert it.
+
+If the starting numbers contain duplicates (e.g. 1 3 3 6 7) then, when it
+comes to trying each number in turn, duplicates are avoided.
+
+"+" or "*" are only tried if the top result on the stack is >= the next result
+(e.g.  we allow 9 + 6 but we avoid 6 + 9).  "*" is avoided is either number is
+1.
+
+Outputting and formatting the possible answers is relatively expensive, so the
+fastest case is to tell the C code what target we're aiming for, and to ask
+only for answers which are at least as close as the closest answer so far.
+
 =head1 AUTHOR
 
-Dave Evans
+Rachel Evans
 
 L<http://djce.org.uk/countdown>
 

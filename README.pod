@@ -104,6 +104,6 @@ only for answers which are at least as close as the closest answer so far.
 
 Rachel Evans
 
-L<http://djce.org.uk/countdown>
+L<http://rve.org.uk/countdown>
 
 =cut

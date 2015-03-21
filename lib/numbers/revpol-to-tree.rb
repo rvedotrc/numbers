@@ -10,11 +10,16 @@ module Numbers
 
         if op.match /^\d+$/
           stack << op.to_i
-        else
+        elsif op == "+"
           if stack.count < 2
             raise StackUnderrunException.new(stack, [op, remaining_tokens].flatten)
           end
           stack << [ :+, [ stack.pop, stack.pop ].reverse ].flatten
+        else
+          if stack.count < 2
+            raise StackUnderrunException.new(stack, [op, remaining_tokens].flatten)
+          end
+          stack << [ :*, [ stack.pop, stack.pop ].reverse ].flatten
         end
       end
 

@@ -29,4 +29,10 @@ describe Numbers::RevpolToTree do
     end
   end
 
+  it "should parse multiplication" do
+    input = '7 2 *'
+    actual = Numbers::RevpolToTree.parse input
+    expect(actual).to eq([ [ :*, 7, 2 ] ])
+  end
+
 end

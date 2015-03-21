@@ -10,20 +10,19 @@ module Numbers
 
         if op.match /^\d+$/
           stack << op.to_i
-        elsif op == "+"
-          if stack.count < 2
-            raise StackUnderrunException.new(stack, [op, remaining_tokens].flatten)
-          end
-          stack << [ :+, [ stack.pop, stack.pop ].reverse ].flatten
         else
-          if stack.count < 2
-            raise StackUnderrunException.new(stack, [op, remaining_tokens].flatten)
-          end
-          stack << [ :*, [ stack.pop, stack.pop ].reverse ].flatten
+          do_binop op, stack, remaining_tokens
         end
       end
 
       stack
+    end
+
+    def self.do_binop(op, stack, remaining_tokens)
+      if stack.count < 2
+        raise StackUnderrunException.new(stack, [op, remaining_tokens].flatten)
+      end
+      stack << [ op.to_sym, [ stack.pop, stack.pop ].reverse ].flatten
     end
 
     class StackUnderrunException < Exception

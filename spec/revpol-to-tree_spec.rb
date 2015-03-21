@@ -56,4 +56,28 @@ describe Numbers::RevpolToTree do
     end
   end
 
+  it "should deal with a complex case" do
+    input = '25 50 6 75 3 100 + * * / +'
+    actual = Numbers::RevpolToTree.parse input
+    expect(actual).to eq(
+      [
+        [ :+, 25, [ :/, 50, [ :*, 6, [ :*, 75, [ :+, 3, 100 ] ] ] ] ]
+      ],
+    )
+  end
+
+  it "should deal with a complex case 2" do
+    input = '10 2 + 7 3 - * 6 /'
+    actual = Numbers::RevpolToTree.parse input
+    expect(actual).to eq(
+      [
+        [ :/, [
+                :*,
+                [:+, 10, 2],
+                [:-, 7, 3],
+              ], 6 ]
+      ],
+    )
+  end
+
 end

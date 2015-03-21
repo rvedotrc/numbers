@@ -27,7 +27,7 @@ module Numbers
       stack << [ op.to_sym, [ stack.pop, stack.pop ].reverse ].flatten
     end
 
-    class StackUnderrunException < Exception
+    class ProcessingException < Exception
       attr_reader :stack, :remaining_tokens
       def initialize(stack, remaining_tokens)
         @stack = stack
@@ -35,12 +35,10 @@ module Numbers
       end
     end
 
-    class UnknownTokenException < Exception
-      attr_reader :stack, :remaining_tokens
-      def initialize(stack, remaining_tokens)
-        @stack = stack
-        @remaining_tokens = remaining_tokens
-      end
+    class StackUnderrunException < ProcessingException
+    end
+
+    class UnknownTokenException < ProcessingException
     end
 
   end

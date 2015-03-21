@@ -20,4 +20,10 @@ describe Numbers::RevpolToTree do
     expect(actual).to eq([ { :+ => [ 3, 2 ] }, 7 ])
   end
 
+  it "should check for stack underrun on +" do
+    expect {
+      Numbers::RevpolToTree.parse '5 +'
+    }.to raise_error Numbers::RevpolToTree::StackUnderrunException
+  end
+
 end

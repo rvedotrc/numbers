@@ -10,8 +10,10 @@ module Numbers
 
         if op.match /^\d+$/
           stack << op.to_i
-        else
+        elsif %w[ + - * / ].include? op
           do_binop op, stack, remaining_tokens
+        else
+          raise UnknownTokenException.new(stack, [op, remaining_tokens].flatten)
         end
       end
 
@@ -26,6 +28,14 @@ module Numbers
     end
 
     class StackUnderrunException < Exception
+      attr_reader :stack, :remaining_tokens
+      def initialize(stack, remaining_tokens)
+        @stack = stack
+        @remaining_tokens = remaining_tokens
+      end
+    end
+
+    class UnknownTokenException < Exception
       attr_reader :stack, :remaining_tokens
       def initialize(stack, remaining_tokens)
         @stack = stack

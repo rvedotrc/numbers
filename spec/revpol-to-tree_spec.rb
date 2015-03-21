@@ -47,4 +47,13 @@ describe Numbers::RevpolToTree do
     expect(actual).to eq([ [ :-, 14, 2 ] ])
   end
 
+  it "should reject other tokens" do
+    expect {
+      Numbers::RevpolToTree.parse '5 3 ^'
+    }.to raise_error Numbers::RevpolToTree::UnknownTokenException do |e|
+      expect(e.stack).to eq([5, 3])
+      expect(e.remaining_tokens).to eq(['^'])
+    end
+  end
+
 end

@@ -12,7 +12,7 @@ module Numbers
         end
       end
 
-      stack.first
+      stack
 
     end
 

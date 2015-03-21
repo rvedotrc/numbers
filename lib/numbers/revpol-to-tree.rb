@@ -14,7 +14,7 @@ module Numbers
           if stack.count < 2
             raise StackUnderrunException.new(stack, [op, remaining_tokens].flatten)
           end
-          stack << { :+ => [ stack.pop, stack.pop ].reverse }
+          stack << [ :+, [ stack.pop, stack.pop ].reverse ].flatten
         end
       end
 

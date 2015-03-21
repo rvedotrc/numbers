@@ -35,4 +35,16 @@ describe Numbers::RevpolToTree do
     expect(actual).to eq([ [ :*, 7, 2 ] ])
   end
 
+  it "should parse division" do
+    input = '14 2 /'
+    actual = Numbers::RevpolToTree.parse input
+    expect(actual).to eq([ [ :/, 14, 2 ] ])
+  end
+
+  it "should parse subtraction" do
+    input = '14 2 -'
+    actual = Numbers::RevpolToTree.parse input
+    expect(actual).to eq([ [ :-, 14, 2 ] ])
+  end
+
 end

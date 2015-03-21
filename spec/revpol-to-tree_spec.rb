@@ -22,8 +22,11 @@ describe Numbers::RevpolToTree do
 
   it "should check for stack underrun on +" do
     expect {
-      Numbers::RevpolToTree.parse '5 +'
-    }.to raise_error Numbers::RevpolToTree::StackUnderrunException
+      Numbers::RevpolToTree.parse '5 + 3'
+    }.to raise_error Numbers::RevpolToTree::StackUnderrunException do |e|
+      expect(e.stack).to eq([5])
+      expect(e.remaining_tokens).to eq(['+', '3'])
+    end
   end
 
 end

@@ -8,4 +8,10 @@ describe Numbers::RevpolToTree do
     expect(actual).to eq(7)
   end
 
+  it "should parse an addition" do
+    input = '7 2 +'
+    actual = Numbers::RevpolToTree.parse input
+    expect(actual).to eq({ :+ => [ 7, 2 ] })
+  end
+
 end

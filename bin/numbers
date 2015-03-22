@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require 'numbers'
+
+fast = ENV["NUMBERS_FAST"] || "./numbers-fast"
+target = ARGV.shift
+results = Numbers::Solver.new(Numbers::Runner.new(fast)).solve(ARGV, target)
+p results

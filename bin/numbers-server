@@ -12,7 +12,7 @@ solver = Numbers::Solver.new(Numbers::Runner.new(fast))
 
 separator = "+"
 
-get '/numbers/target/:target/numbers/:numbers' do |target, numbers|
+get %r'^/numbers/target/(?<target>\d+)/numbers/(?<numbers>[0-9#{separator}]+)(?<verbose>/verbose)?$' do |target, numbers, verbose|
   target = target.to_i
   numbers = numbers.split(separator).map(&:to_i)
 
@@ -21,6 +21,16 @@ get '/numbers/target/:target/numbers/:numbers' do |target, numbers|
   end
 
   data = solver.solve(numbers, target)
+
+  unless verbose
+    data.each do |d|
+      d.delete :reverse_polish
+      d.delete :tree1
+      d.delete :tree2
+      d.delete :tree3
+      d.delete :tree4
+    end
+  end
 
   content_type "application/json"
   expires 300, :public

@@ -14,11 +14,12 @@ describe Numbers::TreeNormaliser do
     expect(actual).to eq(type: :+, positive: [100,17], negative: [10,2], value: 105)
   end
 
-  it "should normalise all operands by descending value" do
+  it "should normalise numbers before operators" do
     seventeen = { type: :+, positive: [20], negative: [3], value: 17 }
-    input = { type: :+, positive: [seventeen, 100], negative: [2,10], value: 105 }
+    twelve = { type: :+, positive: [20], negative: [8], value: 12 }
+    input = { type: :+, positive: [5, seventeen, 100], negative: [2, twelve, 10], value: 98 }
     actual = Numbers::TreeNormaliser.normalise(input)
-    expect(actual).to eq(type: :+, positive: [100,seventeen], negative: [10,2], value: 105)
+    expect(actual).to eq(type: :+, positive: [100,5,seventeen], negative: [10,2,twelve], value: 98)
   end
 
 end

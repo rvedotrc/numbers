@@ -5,20 +5,25 @@ require 'numbers'
 require 'json'
 
 set bind: '0.0.0.0'
+use Rack::Deflater
 
 fast = ENV["NUMBERS_FAST"] || "./numbers-fast"
 solver = Numbers::Solver.new(Numbers::Runner.new(fast))
 
+separator = "+"
+
 get '/numbers/target/:target/numbers/:numbers' do |target, numbers|
   target = target.to_i
-  numbers = numbers.split(",").map(&:to_i)
+  numbers = numbers.split(separator).map(&:to_i)
 
   if numbers != numbers.sort
-    redirect to("/numbers/target/#{target}/numbers/#{numbers.sort.join ","}"), 301
+    redirect to("/numbers/target/#{target}/numbers/#{numbers.sort.join separator}"), 301
   end
 
   data = solver.solve(numbers, target)
+
   content_type "application/json"
+  expires 300, :public
   JSON.generate(data)+"\n"
 end
 

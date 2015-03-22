@@ -121,4 +121,41 @@ describe Numbers::TreeOptimiser do
     )
   end
 
+  it "should not coalesce + and - with * & /" do
+    # (1 + (((2*5)/1) - 3)) * 4
+    input = [
+      :*,
+      [
+        :+,
+        1,
+        [
+          :-,
+          [
+            :/,
+            [ :*, 2, 5 ],
+            1,
+          ],
+          3,
+        ],
+      ],
+      4,
+    ]
+    transformed = Numbers::TreeOptimiser.transform(input)
+    actual = Numbers::TreeOptimiser.coalesce(transformed)
+    expect(actual).to eq(
+      type: :*,
+      positive: [
+        {
+          type: :+,
+          positive: [ 1, {type: :*, positive: [2,5], negative: [1], value: 10} ],
+          negative: [3],
+          value: 8,
+        },
+        4,
+      ],
+      negative: [],
+      value: 32,
+    )
+  end
+
 end

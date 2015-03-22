@@ -23,6 +23,23 @@ module Numbers
       end
     end
 
+    def self.coalesce(node)
+      return node if node.kind_of? Fixnum
+      pos = node[:positive].map {|n| coalesce n}
+
+      i = 0
+      while i < pos.count
+        c = pos[i]
+        if !c.kind_of? Fixnum
+          pos[i..i] = c[:positive]
+          redo
+        end
+        i = i + 1
+      end
+
+      node.merge positive: pos
+    end
+
     def self.value_of(node)
       node.kind_of?(Fixnum) ? node : node[:value]
     end

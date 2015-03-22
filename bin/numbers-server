@@ -22,6 +22,8 @@ get %r'^/numbers/target/(?<target>\d+)/numbers/(?<numbers>[0-9#{separator}]+)(?<
 
   data = solver.solve(numbers, target)
 
+  data.uniq! {|d| d[:string]}
+
   unless verbose
     data.each do |d|
       d.delete :reverse_polish

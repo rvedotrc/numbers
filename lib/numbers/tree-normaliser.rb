@@ -16,7 +16,13 @@ module Numbers
     private
 
     def self.sort_args(list)
-      list.sort.reverse
+      list.sort_by do |c|
+        if c.kind_of? Fixnum
+          c
+        else
+          c[:value]
+        end
+      end.reverse
     end
 
   end

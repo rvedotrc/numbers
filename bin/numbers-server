@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require 'sinatra'
+require 'numbers'
+require 'json'
+
+set bind: '0.0.0.0'
+
+fast = ENV["NUMBERS_FAST"] || "./numbers-fast"
+solver = Numbers::Solver.new(Numbers::Runner.new(fast))
+
+get '/numbers/target/:target/numbers/:numbers' do |target, numbers|
+  target = target.to_i
+  numbers = numbers.split(",").map(&:to_i)
+
+  if numbers != numbers.sort
+    redirect to("/numbers/target/#{target}/numbers/#{numbers.sort.join ","}"), 301
+  end
+
+  data = solver.solve(numbers, target)
+  content_type "application/json"
+  JSON.generate(data)+"\n"
+end
+

@@ -22,4 +22,12 @@ describe Numbers::TreeNormaliser do
     expect(actual).to eq(type: :+, positive: [100,5,seventeen], negative: [10,2,twelve], value: 98)
   end
 
+  it "should compare operators by their operands" do
+    ten_a = { type: :+, positive: [9, 1], negative: [], value: 10 }
+    ten_b = { type: :+, positive: [8, 2], negative: [], value: 10 }
+    input = { type: :*, positive: [ten_a, ten_b, ten_a], negative: [ten_b, ten_a, ten_b], value: 1 }
+    actual = Numbers::TreeNormaliser.normalise(input)
+    expect(actual).to eq(type: :*, positive: [ten_a, ten_a, ten_b], negative: [ten_a, ten_b, ten_b], value: 1)
+  end
+
 end

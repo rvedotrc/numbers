@@ -89,4 +89,36 @@ describe Numbers::TreeOptimiser do
     )
   end
 
+  it "should coalesce multiplication" do
+    input = [
+      :*,
+      [ :*, 2, 4 ],
+      [ :*, 7, 8 ],
+    ]
+    transformed = Numbers::TreeOptimiser.transform(input)
+    actual = Numbers::TreeOptimiser.coalesce(transformed)
+    expect(actual).to eq(
+      type: :*,
+      positive: [ 2, 4, 7, 8 ],
+      negative: [],
+      value: 2*4*7*8,
+    )
+  end
+
+  it "should coalesce division" do
+    input = [
+      :/,
+      [ :/, 36, 3 ],
+      [ :/, 6, 2 ],
+    ]
+    transformed = Numbers::TreeOptimiser.transform(input)
+    actual = Numbers::TreeOptimiser.coalesce(transformed)
+    expect(actual).to eq(
+      type: :*,
+      positive: [ 36, 2 ],
+      negative: [ 6, 3 ],
+      value: 4,
+    )
+  end
+
 end

@@ -1,5 +1,3 @@
-source "https://rubygems.org" do
-  gem 'rspec'
-  gem 'sinatra'
-end
-
+source "https://rubygems.org"
+gem 'rspec'
+gem 'sinatra'

@@ -11,13 +11,13 @@ describe Numbers::RevpolToTree do
   it "should parse an addition" do
     input = '7 2 +'
     actual = Numbers::RevpolToTree.parse input
-    expect(actual).to eq([ [ :+, 7, 2 ] ])
+    expect(actual).to eq([ [ :+, 2, 7 ] ])
   end
 
   it "should should allow multiple trees to be returned" do
     input = '3 2 + 7'
     actual = Numbers::RevpolToTree.parse input
-    expect(actual).to eq([ [ :+, 3, 2 ], 7 ])
+    expect(actual).to eq([ [ :+, 2, 3 ], 7 ])
   end
 
   it "should check for stack underrun on +" do
@@ -32,17 +32,17 @@ describe Numbers::RevpolToTree do
   it "should parse multiplication" do
     input = '7 2 *'
     actual = Numbers::RevpolToTree.parse input
-    expect(actual).to eq([ [ :*, 7, 2 ] ])
+    expect(actual).to eq([ [ :*, 2, 7 ] ])
   end
 
   it "should parse division" do
-    input = '14 2 /'
+    input = '2 14 /'
     actual = Numbers::RevpolToTree.parse input
     expect(actual).to eq([ [ :/, 14, 2 ] ])
   end
 
   it "should parse subtraction" do
-    input = '14 2 -'
+    input = '2 14 -'
     actual = Numbers::RevpolToTree.parse input
     expect(actual).to eq([ [ :-, 14, 2 ] ])
   end
@@ -57,24 +57,24 @@ describe Numbers::RevpolToTree do
   end
 
   it "should deal with a complex case" do
-    input = '25 50 6 75 3 100 + * * / +'
+    input = '25 50 75 3 6 100 + * * - /'
     actual = Numbers::RevpolToTree.parse input
     expect(actual).to eq(
       [
-        [ :+, 25, [ :/, 50, [ :*, 6, [ :*, 75, [ :+, 3, 100 ] ] ] ] ]
+        [ :/, [ :-, [ :*, [ :*, [ :+, 100, 6 ], 3 ], 75 ], 50 ], 25 ]
       ],
     )
   end
 
   it "should deal with a complex case 2" do
-    input = '10 2 + 7 3 - * 6 /'
+    input = '6 2 10 + 3 7 - * /'
     actual = Numbers::RevpolToTree.parse input
     expect(actual).to eq(
       [
         [ :/, [
                 :*,
-                [:+, 10, 2],
                 [:-, 7, 3],
+                [:+, 10, 2],
               ], 6 ]
       ],
     )

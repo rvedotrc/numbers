@@ -23,7 +23,7 @@ describe Numbers do
   end
 
   it "should handle complex cases" do
-    expect(try('50 75 25 / - 6 * 3 * 100 +')).to eq('100 + 6 * 3 * (50 - 75 / 25)')
+    expect(try('25 50 75 3 6 100 + * * - /')).to eq('(75 * 3 * (100 + 6) - 50) / 25')
   end
 
 end

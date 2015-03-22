@@ -26,8 +26,8 @@ module Numbers
       if stack.count < 2
         raise StackUnderrunException.new(stack, [op, remaining_tokens].flatten)
       end
-      y = stack.pop
       x = stack.pop
+      y = stack.pop
       stack << [ op.to_sym, x, y ]
     end
 

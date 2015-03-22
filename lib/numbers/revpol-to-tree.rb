@@ -20,6 +20,8 @@ module Numbers
       stack
     end
 
+    private
+
     def self.do_binop(op, stack, remaining_tokens)
       if stack.count < 2
         raise StackUnderrunException.new(stack, [op, remaining_tokens].flatten)

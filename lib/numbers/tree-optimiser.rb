@@ -16,6 +16,8 @@ module Numbers
       )
     end
 
+    private
+
     def self.positive_negative(pos, neg, type)
       (pos.map do |child|
         if child.kind_of? Fixnum or child[:type] != type

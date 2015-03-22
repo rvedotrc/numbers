@@ -23,6 +23,8 @@ module Numbers
       end
     end
 
+    private
+
     def self.value_of(node)
       node.kind_of?(Fixnum) ? node : node[:value]
     end

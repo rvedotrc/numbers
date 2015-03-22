@@ -73,4 +73,20 @@ describe Numbers::TreeOptimiser do
     )
   end
 
+  it "should coalesce subtraction" do
+    input = [
+      :-,
+      [ :-, 8, 2 ],
+      [ :-, 4, 1 ],
+    ]
+    transformed = Numbers::TreeOptimiser.transform(input)
+    actual = Numbers::TreeOptimiser.coalesce(transformed)
+    expect(actual).to eq(
+      type: :+,
+      positive: [ 8, 1 ],
+      negative: [ 4, 2 ],
+      value: 3,
+    )
+  end
+
 end

@@ -26,18 +26,40 @@ module Numbers
     def self.coalesce(node)
       return node if node.kind_of? Fixnum
       pos = node[:positive].map {|n| coalesce n}
+      neg = node[:negative].map {|n| coalesce n}
 
-      i = 0
-      while i < pos.count
-        c = pos[i]
-        if !c.kind_of? Fixnum
-          pos[i..i] = c[:positive]
-          redo
+      new_positive = pos.map do |child|
+        if child.kind_of? Fixnum
+          child
+        else
+          child[:positive]
         end
-        i = i + 1
-      end
+      end + neg.map do |child|
+        if child.kind_of? Fixnum
+          []
+        else
+          child[:negative]
+        end
+      end.flatten
 
-      node.merge positive: pos
+      new_negative = neg.map do |child|
+        if child.kind_of? Fixnum
+          child
+        else
+          child[:positive]
+        end
+      end + pos.map do |child|
+        if child.kind_of? Fixnum
+          []
+        else
+          child[:negative]
+        end
+      end.flatten
+
+      node.merge(
+        positive: new_positive.flatten,
+        negative: new_negative.flatten,
+      )
     end
 
     def self.value_of(node)

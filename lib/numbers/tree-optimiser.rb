@@ -28,7 +28,17 @@ module Numbers
       pos = node[:positive].map {|n| coalesce n}
       neg = node[:negative].map {|n| coalesce n}
 
-      new_positive = pos.map do |child|
+      new_positive = positive_negative(pos, neg)
+      new_negative = positive_negative(neg, pos)
+
+      node.merge(
+        positive: new_positive,
+        negative: new_negative,
+      )
+    end
+
+    def self.positive_negative(pos, neg)
+      (pos.map do |child|
         if child.kind_of? Fixnum
           child
         else
@@ -40,26 +50,7 @@ module Numbers
         else
           child[:negative]
         end
-      end.flatten
-
-      new_negative = neg.map do |child|
-        if child.kind_of? Fixnum
-          child
-        else
-          child[:positive]
-        end
-      end + pos.map do |child|
-        if child.kind_of? Fixnum
-          []
-        else
-          child[:negative]
-        end
-      end.flatten
-
-      node.merge(
-        positive: new_positive.flatten,
-        negative: new_negative.flatten,
-      )
+      end).flatten
     end
 
     def self.value_of(node)

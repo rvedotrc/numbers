@@ -8,8 +8,8 @@ module Numbers
       return node if node.kind_of? Fixnum
 
       node.merge(
-        positive: node[:positive].sort {|a,b| compare_operands a, b},
-        negative: node[:negative].sort {|a,b| compare_operands a, b},
+        positive: node[:positive].map {|c| normalise c}.sort {|a,b| compare_operands a, b},
+        negative: node[:negative].map {|c| normalise c}.sort {|a,b| compare_operands a, b},
       )
     end
 

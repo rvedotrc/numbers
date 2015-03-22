@@ -30,4 +30,14 @@ describe Numbers::TreeNormaliser do
     expect(actual).to eq(type: :*, positive: [ten_a, ten_a, ten_b], negative: [ten_a, ten_b, ten_b], value: 1)
   end
 
+  it "should normalise recursively" do
+    ten_a = { type: :+, positive: [4,6], negative: [], value: 10 }
+    ten_b = { type: :+, positive: [3,7], negative: [], value: 10 }
+    input = { type: :*, positive: [ten_b], negative: [ten_a], value: 1 }
+    actual = Numbers::TreeNormaliser.normalise(input)
+    opt_ten_a = { type: :+, positive: [6,4], negative: [], value: 10 }
+    opt_ten_b = { type: :+, positive: [7,3], negative: [], value: 10 }
+    expect(actual).to eq(type: :*, positive: [opt_ten_b], negative: [opt_ten_a], value: 1)
+  end
+
 end

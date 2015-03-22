@@ -11,6 +11,9 @@ numbers - "Countdown" numbers game solver
   # target as the closest found so far
   ./numbers -t TARGET NUMBER [NUMBER ...]
 
+There's also a sinatra-based REST interface to the solver (returns the results
+as json), and a Dockerfile to run that server.
+
 =head1 DESCRIPTION
 
 See L<http://en.wikipedia.org/wiki/Countdown_(game_show)#Numbers_round>
@@ -28,6 +31,7 @@ close to the target as the closest found so far).
 
 The heavy lifting is done in C (for speed).  The results are then formatted
 using Perl (because it is the language I was most familiar with at the time).
+There's also an implementation of the formatting layer in Ruby.
 
 The algorithm is based on a Reverse-Polish stack.  At any given time we have:
 

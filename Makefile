@@ -3,5 +3,6 @@
 all: numbers-fast
 
 test: numbers numbers-fast
-	prove -vr t
+	prove -r t
+	rspec
 

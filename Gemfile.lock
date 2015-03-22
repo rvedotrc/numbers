@@ -28,5 +28,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  rspec!
-  sinatra!
+  rspec
+  sinatra

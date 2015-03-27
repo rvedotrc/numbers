@@ -22,3 +22,21 @@ Feature: the REST server
         When I run the solver
         Then the solutions are verbose
 
+    Scenario Outline: various invalid inputs
+        Given numbers "<numbers>"
+        And target "<target>"
+        Then the solver should <reject> the request
+        Examples:
+            | reject | target | numbers | comment        |
+            | accept | 1      | 1 2 3   | ok             |
+            | reject | 0      | 1 2 3   | target zero     |
+            | reject | -1     | 1 2 3   | target negative |
+            | reject | 100000 | 1 2 3   | target too big  |
+            | accept | 10000 | 1 2 3    | target ok       |
+            | reject | 1      | 0 2 3   | number 0       |
+            | reject | 1      | 1 2 3 4 5 6 7 | too many numbers |
+            | reject | 1      | -1 2 3  | number negative |
+            | reject | 1      | 1 2 100000 | number too big |
+            | fail   | 1      | 1 2 1001  | number too big |
+            | accept | 1      | 1 2 1000  | number ok |
+

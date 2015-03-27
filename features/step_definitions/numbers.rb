@@ -37,3 +37,17 @@ Then(/^the solutions are (?<not>not )?verbose$/) do |not_verbose|
   end
 end
 
+Then(/^the solver should reject the request$/) do
+  url = "target/#{@target}/numbers/#{@numbers.join "+"}"
+  url += "/verbose" if @verbose
+  expect {
+    NumbersServer.get url
+  }.to raise_error(RestClient::ResourceNotFound)
+end
+
+Then(/^the solver should accept the request$/) do
+  url = "target/#{@target}/numbers/#{@numbers.join "+"}"
+  url += "/verbose" if @verbose
+  NumbersServer.get url
+end
+

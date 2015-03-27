@@ -11,13 +11,19 @@ fast = ENV["NUMBERS_FAST"] || "./numbers-fast"
 solver = Numbers::Solver.new(Numbers::Runner.new(fast))
 
 separator = "+"
-valid_number = %r'[1-9][0-9]{0,4}'
+valid_number = %r'[1-9][0-9]{0,6}'
 max_numbers = 6
+max_target = 1000000 # matches MAX_TARGET in ../numbers-fast.c
+max_number = 1000 # matches MAX_NUMBER in ../numbers-fast.c
 numbers_pattern = %r'#{valid_number}(?:#{Regexp.quote separator}#{valid_number}){0,#{max_numbers-1}}'
 
 get %r'^/numbers/target/(?<target>#{valid_number})/numbers/(?<numbers>#{numbers_pattern})(?<verbose>/verbose)?$' do |target, numbers, verbose|
   target = target.to_i
   numbers = numbers.split(separator).map(&:to_i)
+
+  if target > max_target or numbers.max > max_number
+    halt 404
+  end
 
   if numbers != numbers.sort
     redirect to("/numbers/target/#{target}/numbers/#{numbers.sort.join separator}"), 301

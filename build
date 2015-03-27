@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -eux
+
+mkdir -p var
+docker build . > var/build.log 2>&1
+
+image_id=$( tail -n1 var/build.log | perl -ne '/^Successfully built (\w+)$/ and print $1' )
+[ "$image_id" ]
+echo $image_id > var/image_id
+
+if [ -f var/container_id ] ; then
+	docker stop -t 0 $( cat var/container_id )
+	rm -f var/container_id
+fi
+
+container_id=$( docker run -d -P $image_id )
+[ "$container_id" ]
+echo $container_id > var/container_id
+
+echo OK

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -eux
+
+port=49157
+
+[ -f var/image_id ]
+image_id=$( cat var/image_id )
+[ "$image_id" ]
+
+# Kill whichever container is forwarding $port
+for c in `docker ps -q` ; do
+	this_one=$( docker inspect $c | jq -M --arg port $port '.[0].NetworkSettings.Ports["4567/tcp"][0].HostPort == $port' )
+	if [ "$this_one" == "true" ] ; then
+		docker kill $c
+		break
+	fi
+done
+
+container_id=$( docker run -d -p $port:4567 $image_id )
+[ "$container_id" ]
+echo $container_id > var/live_container_id
+
+echo OK

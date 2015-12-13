@@ -1,0 +1,23 @@
+#log {
+        border: 1px solid blue;
+        padding: 0.5em;
+}
+
+#log {
+        list-style-type: none;
+}
+
+#log > li {
+        border: 1px solid green;
+        padding: 0.5em;
+}
+
+.t { width: 5em; }
+.n { width: 3em; }
+
+.answerList { list-style-type: disc; }
+
+.string { }
+.result:before { content: " gives "; }
+.offBy:before { content: " which is off by "; }
+.score:before { content: " and so scores "; }

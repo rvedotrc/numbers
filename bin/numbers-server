@@ -18,6 +18,10 @@ max_target = 1000000 # matches MAX_TARGET in ../numbers-fast.c
 max_number = 1000 # matches MAX_NUMBER in ../numbers-fast.c
 numbers_pattern = %r'#{valid_number}(?:#{Regexp.quote separator}#{valid_number}){0,#{max_numbers-1}}'
 
+get %r'^/static/(.*)$' do |path|
+  send_file File.join("./public", path)
+end
+
 get %r'^/numbers/target/(?<target>#{valid_number})/numbers/(?<numbers>#{numbers_pattern})(?<verbose>/verbose)?$' do |target, numbers, verbose|
   target = target.to_i
   numbers = numbers.split(separator).map(&:to_i)

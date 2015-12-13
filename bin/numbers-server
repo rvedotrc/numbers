@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'sinatra'
+require 'sinatra/cross_origin'
 require 'numbers'
 require 'json'
 
@@ -45,6 +46,10 @@ get %r'^/numbers/target/(?<target>#{valid_number})/numbers/(?<numbers>#{numbers_
   end
 
   content_type "application/json"
+  cross_origin :allow_origin => 'http://127.0.0.1:1801',
+    :allow_methods => [:get],
+    :allow_credentials => false,
+    :max_age => "300"
   expires 300, :public
   JSON.generate(data)+"\n"
 end

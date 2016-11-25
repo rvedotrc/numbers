@@ -332,7 +332,7 @@ sub ugliness {
 
 sub mult_ugliness {
 	my $value = shift;
-	if ($value <= 10 or $value == 100)
+	if ($value <= 10 or $value == 100 or $value == 50)
 	{
 		return 1;
 	}

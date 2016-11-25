@@ -14,6 +14,9 @@ Usage: numbers [OPTIONS] NUMBER ...
 \                        than the closest found so far (requires --target)
 \    -w, --within=DIFF   Ignore results more than DIFF away from TARGET
 \                        (requires --target)
+\    -s, --simplest      Ignore solutions that are 'harder' than the last
+\                        shown most accurate result, according to a heuristic
+\                        (requires --simplest)
 \    -h, --help          Shows this help
 
 Examples:
@@ -47,12 +50,14 @@ sub usage
 	my $target;
 	my $all;
 	my $within;
+	my $simplest;
 
 	use Getopt::Long;
 	GetOptions(
 		"target|t=n"	=> \$target,
 		"all|a"			=> \$all,
 		"within|w=n"	=> \$within,
+		"simplest|s"	=> \$simplest,
 		"help|h"		=> sub { print $help; exit; },
 	) or exit 2;
 
@@ -61,6 +66,9 @@ sub usage
 
 	usage("--all makes no sense without --target")
 		if $all and not defined($target);
+
+	usage("--simplest makes no sense without --target")
+		if $simplest and not defined($target);
 
 	@ARGV or usage("No numbers specified");
 
@@ -81,13 +89,17 @@ sub usage
 	{
 		my $best = undef;
 		my $best_r;
+		my $best_ugliness = 1000;
 
 		$cb = sub {
 			my ($got, $ops) = @_;
 			my $got_r = abs($got-$target);
+			my $ugliness = ugliness($_[1]);
+
 			return if defined($within) and $got_r > $within;
 			return if not $all and defined($best_r) and $got_r > $best_r;
-			$best_r = $got_r; $best = $got;
+			return if $simplest and defined($best_r) and $got_r == $best_r and $ugliness > $best_ugliness;
+			$best_r = $got_r; $best = $got; $best_ugliness = $ugliness;
 			&$show(@_);
 		};
 	} else {
@@ -282,6 +294,54 @@ sub node_to_string
 	}
 
 	die "Unknown node type '$node->{type}'";
+}
+
+sub ugliness {
+	my ($ops) = @_;
+	my $score = 0;
+	my @stack;
+
+	# ugliness scoring:
+	# 1 point for multiplication by 50, 100 or <10, and any other operation
+	# 2 points for multiplication by 25 or 75
+	# 3 points for multiplication by any other number
+	# TODO: work out if division should maybe be given 2 points?
+	for my $op (@$ops)
+	{
+		if ($op =~ /\d/)
+		{
+			push @stack, 0+$op;
+		} else {
+			my $x = pop @stack;
+			my $y = pop @stack;
+
+			if ($op eq '*')
+			{
+				use List::Util 'max';
+				my $ugliness = max(mult_ugliness($x), mult_ugliness($y));
+				$score += $ugliness;
+			} else {
+				$score += 1;
+			}
+
+			push @stack, eval("$x $op $y");
+		}
+	}
+	return $score;
+}
+
+sub mult_ugliness {
+	my $value = shift;
+	if ($value <= 10 or $value == 100)
+	{
+		return 1;
+	}
+	elsif ($value == 25 or $value == 75)
+	{
+		return 2;
+	} else {
+		return 3;
+	}
 }
 
 # eof numbers

@@ -4,7 +4,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 my @out;
 my @expect;
@@ -38,6 +38,9 @@ EOF
 ok(@out == 2 or $out[-3] !~ / = 29$/);
 @out = @out[-2,-1];
 check_all(\@out, \@expect);
+
+@out=`./numbers -t 100 -s 10 10 5 2`;
+ok($out[-1] =~ /^10 \* 10 = 100$/, "--simplest");
 
 sub check_all {
 	my ($got, $want, $name) = @_;

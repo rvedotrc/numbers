@@ -89,17 +89,17 @@ sub usage
 	{
 		my $best = undef;
 		my $best_r;
-		my $best_ugliness = 1000;
+		my $best_complexity = 1000;
 
 		$cb = sub {
 			my ($got, $ops) = @_;
 			my $got_r = abs($got-$target);
-			my $ugliness = ugliness($_[1]);
+			my $complexity = complexity($_[1]);
 
 			return if defined($within) and $got_r > $within;
 			return if not $all and defined($best_r) and $got_r > $best_r;
-			return if $simplest and defined($best_r) and $got_r == $best_r and $ugliness > $best_ugliness;
-			$best_r = $got_r; $best = $got; $best_ugliness = $ugliness;
+			return if $simplest and defined($best_r) and $got_r == $best_r and $complexity > $best_complexity;
+			$best_r = $got_r; $best = $got; $best_complexity = $complexity;
 			&$show(@_);
 		};
 	} else {
@@ -296,12 +296,12 @@ sub node_to_string
 	die "Unknown node type '$node->{type}'";
 }
 
-sub ugliness {
+sub complexity {
 	my ($ops) = @_;
 	my $score = 0;
 	my @stack;
 
-	# ugliness scoring:
+	# Complexity scoring:
 	# 1 point for multiplication by 50, 100 or <10, and any other operation
 	# 2 points for multiplication by 25 or 75
 	# 3 points for multiplication by any other number
@@ -318,8 +318,8 @@ sub ugliness {
 			if ($op eq '*')
 			{
 				use List::Util 'max';
-				my $ugliness = max(mult_ugliness($x), mult_ugliness($y));
-				$score += $ugliness;
+				my $complexity = max(mult_complexity($x), mult_complexity($y));
+				$score += $complexity;
 			} else {
 				$score += 1;
 			}
@@ -330,7 +330,7 @@ sub ugliness {
 	return $score;
 }
 
-sub mult_ugliness {
+sub mult_complexity {
 	my $value = shift;
 	if ($value <= 10 or $value == 100 or $value == 50)
 	{
